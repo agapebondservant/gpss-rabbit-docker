@@ -1,0 +1,33 @@
+#@ load("@ytt:data", "data")
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gpss-rabbit
+  labels:
+    gpss-app: rabbitmq
+spec:
+  selector:
+    matchLabels:
+      gpss-app: rabbitmq
+  template:
+    metadata:
+      labels:
+        gpss-app: rabbitmq
+    spec:
+      containers:
+        - name: main
+          image: #@ data.values.registry_username + '/gpss-rabbit'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gpss-rabbit
+spec:
+  selector:
+    gpss-app: rabbitmq
+  ports:
+    - name: main
+      port: 5000
+      targetPort: 5000
+  type: LoadBalancer

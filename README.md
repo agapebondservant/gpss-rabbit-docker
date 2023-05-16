@@ -19,10 +19,43 @@ tanzu acc create gpss-rabbit --git-repository https://github.com/agapebondservan
 ## Contents
 1. [Deploy GPSS connector on vanilla K8s](#k8s)
 
-### Install GPSS on vanilla K8s<a name="k8s"/>
+### Deploy GPSS on vanilla K8s<a name="k8s"/>
 
 #### Before you begin (one time setup):
 1. Create an environment file `.env` (use `.env-sample` as a template), then run:
 ```
 source .env
+export GPSS_NAMESPACE=gpss # or preferred namespace
 ```
+
+#### Deploy GPSS Server
+1. Build Docker image which launches a GPSS Server instance (if it has not already been built):
+```
+cd resources/server
+docker build -t $DATA_E2E_REGISTRY_USERNAME/gpss-rabbit .
+docker push $DATA_E2E_REGISTRY_USERNAME/gpss-rabbit
+cd -
+```
+
+2. Deploy GPSS Server instance:
+```
+kubectl create ns $GPSS_NAMESPACE || true
+ytt -f resources/gpss-server.yaml -v registry_username=$DATA_E2E_REGISTRY_USERNAME | kubectl apply -n $GPSS_NAMESPACE -f -
+watch kubectl get all -n $GPSS_NAMESPACE
+```
+
+3. To troubleshoot, view logs:
+```
+kubectl logs -l gpss-app=rabbitmq -n $GPSS_NAMESPACE
+```
+Or:
+```
+kubectl describe pod -l gpss-app=rabbitmq -n $GPSS_NAMESPACE
+```
+
+To undeploy:
+```
+kubectl delete all --all -n $GPSS_NAMESPACE
+```
+
+#### Deploy GPSS Client

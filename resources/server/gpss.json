@@ -1,0 +1,19 @@
+{
+  "ListenAddress": {
+    "Host": ""
+  },
+  "Gpfdist": {
+    "Host": "",
+    "ReuseTables": false
+  },
+  "Monitor": {
+    "Prometheus": {
+      "Listening": "0.0.0.0:5001"
+    },
+    "JobStore": {
+      "File": {
+        "Directory": "/home/gpadmin/jobstore"
+      }
+    }
+  }
+}
