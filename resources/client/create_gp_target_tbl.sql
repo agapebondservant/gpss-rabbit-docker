@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS public.mds_fraud_transactions( date_time text, transaction_type text, card_number text, amount text, location text, lat float8, long float8);

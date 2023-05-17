@@ -4,7 +4,9 @@ accelerator:
   iconUrl: https://cdn.icon-icons.com/icons2/2699/PNG/512/greenplum_logo_icon_170052.png
   tags:
   - "DataOps"
+  - "rabbit"
   - "rabbitmq"
+  - "etl"
   - "greenplum"
   - "gpss"
   - "streaming"

@@ -1,0 +1,44 @@
+#@ load("@ytt:data", "data")
+---
+DATABASE: #@ data.values.gp_database
+USER: #@ data.values.gp_username
+PASSWORD: #@ data.values.gp_password
+HOST: #@ data.values.gp_host
+PORT: #@ data.values.gp_port
+VERSION: 2
+RABBITMQ:
+  INPUT:
+    SOURCE:
+      SERVER: #@ data.values.rabbit_server
+      QUEUE: #@ data.values.rabbit_queue_or_stream
+    DATA:
+      COLUMNS:
+        - NAME: #@ data.values.rabbit_column
+          TYPE: json
+      FORMAT: jsonl
+    ERROR_LIMIT: 20
+  OUTPUT:
+    SCHEMA: #@ data.values.gp_output_schema
+    TABLE: #@ data.values.gp_output_table
+    MAPPING:
+      - NAME: date_time
+        EXPRESSION: (j->>'dateTime')::text
+      - NAME: transaction_type
+        EXPRESSION: (j->>'transactionType')::text
+      - NAME: card_number
+        EXPRESSION: (j->>'cardNumber')::text
+      - NAME: amount
+        EXPRESSION: (j->>'amount')::text
+      - NAME: location
+        EXPRESSION: (j->>'location')::text
+      - NAME: lat
+        EXPRESSION: (j->>'lat')::float8
+      - NAME: long
+        EXPRESSION: (j->>'long')::float8
+  METADATA:
+    SCHEMA: public
+  COMMIT:
+    MINIMAL_INTERVAL: 200
+    CONSISTENCY: at-least
+  PROPERTIES:
+    eof.when.idle: 1500

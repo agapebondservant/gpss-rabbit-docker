@@ -28,6 +28,15 @@ source .env
 export GPSS_NAMESPACE=gpss # or preferred namespace
 ```
 
+2. Update template files:
+```
+for orig in `find . -name "*.in.*" -type f`; do
+  target=$(echo $orig | sed 's/\.in//')
+  envsubst < $orig > $target
+  grep -qxF $target .gitignore || echo $target >> .gitignore
+done
+```
+
 #### Deploy GPSS Server
 1. Build Docker image which launches a GPSS Server instance (if it has not already been built):
 ```
@@ -40,7 +49,7 @@ cd -
 2. Deploy GPSS Server instance:
 ```
 kubectl create ns $GPSS_NAMESPACE || true
-ytt -f resources/gpss-server.yaml -v registry_username=$DATA_E2E_REGISTRY_USERNAME | kubectl apply -n $GPSS_NAMESPACE -f -
+ytt -f resources/server/gpss-server.yaml -v registry_username=$DATA_E2E_REGISTRY_USERNAME | kubectl apply -n $GPSS_NAMESPACE -f -
 watch kubectl get all -n $GPSS_NAMESPACE
 ```
 
@@ -59,3 +68,30 @@ kubectl delete all --all -n $GPSS_NAMESPACE
 ```
 
 #### Deploy GPSS Client
+1. Create target table in Greenplum instance:
+```
+export DATA_E2E_ML_TRAINING_DB_PASSWORD=<enter password>
+export PSQL_CONNECT_STR=postgresql://${DATA_E2E_ML_TRAINING_DB_USERNAME}:${DATA_E2E_ML_TRAINING_DB_PASSWORD}@${DATA_E2E_ML_TRAINING_DB_HOST}:${DATA_E2E_ML_TRAINING_DB_PORT}/${DATA_E2E_ML_TRAINING_DB_DATABASE}?sslmode=require
+psql ${PSQL_CONNECT_STR} -f resources/client/create_gp_target_tbl.sql
+```
+
+2. Generate and upload the gpss-client.yaml file:
+```
+ytt -f resources/client/gpss-client.yaml \
+    -f resources/client/values.yaml \
+    -v rabbit_server=$(kubectl get svc ${DATA_E2E_GPSS_RABBIT_SVC} -n ${DATA_E2E_GPSS_RABBIT_NS} -o jsonpath="{.status.loadBalancer.ingress[0].hostname}") \
+    -v gp_password=${DATA_E2E_ML_TRAINING_DB_PASSWORD} > resources/client/gpss-client-updated.yaml
+kubectl cp resources/client/gpss-client-updated.yaml $GPSS_NAMESPACE/$(kubectl get pod -l gpss-app=rabbitmq -n $GPSS_NAMESPACE -o custom-columns=":metadata.name" --no-headers):/tmp
+```
+
+3. Initiate the gsscli load job from RabbitMQ to Greenplum:
+```
+kubectl exec -it $(kubectl get pod -oname -l gpss-app=rabbitmq -n $GPSS_NAMESPACE) -n $GPSS_NAMESPACE -- sh
+source /usr/local/gpss-1.9.0/gpss_path.sh
+gpsscli load /tmp/gpss-client-updated.yaml 
+```
+
+4. To troubleshoot, view the most recent logs:
+```
+cat $GPSS_HOME/gpsslogs/$(ls -Art $GPSS_HOME/gpsslogs | tail -n 1)
+```

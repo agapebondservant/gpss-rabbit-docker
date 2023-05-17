@@ -12,7 +12,7 @@ COPY gpssrotate.conf /etc/logrotate.d/
 RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-* && \
     sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-* && \
     yum update -y && \
-    yum install -y /tmp/${GPSS_BINARY}
+    yum install -y /tmp/${GPSS_BINARY} krb5-devel.x86_64
 
 COPY gpss.json /usr/local/gpss-${GPSS_VER}
 

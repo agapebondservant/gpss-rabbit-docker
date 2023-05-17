@@ -1,0 +1,10 @@
+#@data/values
+---
+gp_database: ${DATA_E2E_ML_TRAINING_DB_DATABASE}
+gp_username: ${DATA_E2E_ML_TRAINING_DB_USERNAME}
+gp_host: ${DATA_E2E_ML_TRAINING_DB_HOST}
+gp_port: ${DATA_E2E_ML_TRAINING_DB_PORT}
+gp_output_schema: ${DATA_E2E_GPSS_OUTPUT_SCHEMA}
+gp_output_table: ${DATA_E2E_GPSS_OUTPUT_TABLE}
+rabbit_queue_or_stream: ${DATA_E2E_GPSS_RABBIT_INPUT_QUEUE_OR_STREAM}
+rabbit_column: ${DATA_E2E_GPSS_RABBIT_COLUMN}

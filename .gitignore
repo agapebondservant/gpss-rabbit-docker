@@ -1,3 +1,6 @@
 .envgpss-gpdb6-1.9.0-rhel7-x86_64.gppkg
 bin/
 .env
+creditcard.csv
+resources/client/values.yaml
+resources/client/gpss-client-updated.yaml
