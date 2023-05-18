@@ -4,3 +4,7 @@ bin/
 creditcard.csv
 resources/client/values.yaml
 resources/client/gpss-client-updated.yaml
+resources/client/gpss-client-binary-updated.yaml
+resources/client/gpss-client-binary.yaml
+
+

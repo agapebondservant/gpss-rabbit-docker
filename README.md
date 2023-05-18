@@ -79,7 +79,7 @@ psql ${PSQL_CONNECT_STR} -f resources/client/create_gp_target_tbl.sql
 ```
 ytt -f resources/client/gpss-client.yaml \
     -f resources/client/values.yaml \
-    -v rabbit_server=$(kubectl get svc ${DATA_E2E_GPSS_RABBIT_SVC} -n ${DATA_E2E_GPSS_RABBIT_NS} -o jsonpath="{.status.loadBalancer.ingress[0].hostname}") \
+    -v rabbit_server=${DATA_E2E_GPSS_RABBIT_USER}:${DATA_E2E_GPSS_RABBIT_PWD}@$(kubectl get svc ${DATA_E2E_GPSS_RABBIT_SVC} -n ${DATA_E2E_GPSS_RABBIT_NS} -o jsonpath="{.status.loadBalancer.ingress[0].hostname}"):5672 \
     -v gp_password=${DATA_E2E_ML_TRAINING_DB_PASSWORD} > resources/client/gpss-client-updated.yaml
 kubectl cp resources/client/gpss-client-updated.yaml $GPSS_NAMESPACE/$(kubectl get pod -l gpss-app=rabbitmq -n $GPSS_NAMESPACE -o custom-columns=":metadata.name" --no-headers):/tmp
 ```

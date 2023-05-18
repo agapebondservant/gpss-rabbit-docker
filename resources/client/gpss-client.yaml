@@ -22,19 +22,19 @@ RABBITMQ:
     TABLE: #@ data.values.gp_output_table
     MAPPING:
       - NAME: date_time
-        EXPRESSION: (j->>'dateTime')::text
+        EXPRESSION: (transaction->>'dateTime')::text
       - NAME: transaction_type
-        EXPRESSION: (j->>'transactionType')::text
+        EXPRESSION: (transaction->>'transactionType')::text
       - NAME: card_number
-        EXPRESSION: (j->>'cardNumber')::text
+        EXPRESSION: (transaction->>'cardNumber')::text
       - NAME: amount
-        EXPRESSION: (j->>'amount')::text
+        EXPRESSION: (transaction->>'amount')::text
       - NAME: location
-        EXPRESSION: (j->>'location')::text
+        EXPRESSION: (transaction->>'location')::text
       - NAME: lat
-        EXPRESSION: (j->>'lat')::float8
+        EXPRESSION: (transaction->>'lat')::float8
       - NAME: long
-        EXPRESSION: (j->>'long')::float8
+        EXPRESSION: (transaction->>'long')::float8
   METADATA:
     SCHEMA: public
   COMMIT:
